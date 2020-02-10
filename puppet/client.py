@@ -5,7 +5,7 @@
 """
 __author__ = "睿瞳深邃(https://github.com/Raytone-D)"
 __project__ = 'Puppet'
-__version__ = "0.8.15"
+__version__ = "0.8.17"
 __license__ = 'MIT'
 
 import ctypes
@@ -625,11 +625,12 @@ class Client:
         return text if text else '委托成功后是否弹出提示对话框：否'
 
     def answer(self):
-        text = self.capture()
-        if any(('年化收益率' in text, '小数部分' in text)):
-            text = f'{text} {self.capture()}'
-        return (re.findall(r'(\w*[0-9]+)\w*', text)[0],
-                text) if '合同编号' in text else (0, text)
+        """2020-2-10 修改逻辑确保回报窗口被关闭"""
+        for _ in range(3):
+            text = self.capture()
+            if '合同编号' in text:
+                return re.findall(r'(\w*[0-9]+)\w*', text)[0], text
+        return 0, "木偶取不到返回值！"
 
     def refresh(self):
         print('Refreshing page...')
